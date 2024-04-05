@@ -1,28 +1,30 @@
-var inputvalue = document.querySelector('#city');
-var btn = document.querySelector('#submit');
-var city = document.querySelector('#cityoutput');
-var description = document.querySelector('#description');
-var temp = document.querySelector('#temp');
-var wind = document.querySelector('#wind');
-var apik = "null";
+const apiKey = "ce7b882112da8ae5b325980be648f2ef";
+const apiUrl = "https://api.openweathermap.org/data/2.5/weather?";
 
-function convertion(val) {
-    return (val - 273).toFixed(3);
-}
+const locationInput = document.getElementById('locationInput');
+const searchButton = document.getElementById('searchButton');
+const locationElement = document.getElementById('location');
+const temperatureElement = document.getElementById('temperature');
+const descriptionElement = document.getElementById('description');
 
-btn.addEventListener('click', function() {
-    fetch('https://api.openweathermap.org/data/2.5/weather?q=' + inputvalue.value + '&appid=' + apik)
-    .then(res => res.json())  
-    .then(data => {
-        var nameval = data.name;
-        var descrip = data.weather[0].description;
-        var tempature = data.main.temp;
-        var wndspeed = data.wind.speed;
-
-        city.innerHTML = `Weather of <span>${nameval}</span>`;
-        temp.innerHTML = `Temperature: <span>${convertion(tempature)} C</span>`;
-        description.innerHTML = `Sky conditions: <span>${descrip}</span>`;
-        wind.innerHTML = `Wind speed: <span>${wndspeed} km/h</span>`;
-    }) 
-    .catch(err => alert('You entered the wrong city.'));
+searchButton.addEventListener('click', () => {
+    const location = locationInput.value;
+    if (location) {
+        fetchWeather(location);
+    }
 });
+
+function fetchWeather(location) {
+    const url = `${apiUrl}?q=${location}&appid=${apiKey}&units=metric`;
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            locationElement.textContent = data.name;
+            temperatureElement.textContent = `${Math.round(data.main.temp)}°C`;
+            descriptionElement.textContent = data.weather[0].description;
+        })
+        .catch(error => {
+            console.error('Error fetching weather data:', error);
+        });
+}
